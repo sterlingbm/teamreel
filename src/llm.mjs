@@ -1,6 +1,6 @@
 // llm.mjs — one text call, whichever provider the team brought a key for.
 //
-//   ANTHROPIC_API_KEY  → Claude      (SHIPREEL_MODEL default claude-sonnet-5-5)
+//   ANTHROPIC_API_KEY  → Claude      (TEAMREEL_MODEL default claude-sonnet-5-5)
 //   OPENAI_API_KEY     → OpenAI      (default gpt-5-mini)
 //   GEMINI_API_KEY     → Gemini      (default gemini-3.8-flash)
 //
@@ -27,7 +27,7 @@ async function post(url, headers, body) {
 
 /** Returns the model's text. `system` and `user` are plain strings. */
 export async function complete(provider, { system, user, maxTokens = 4000 }) {
-  const model = process.env.SHIPREEL_MODEL;
+  const model = process.env.TEAMREEL_MODEL;
   if (provider === 'anthropic') {
     const d = await post('https://api.anthropic.com/v1/messages',
       { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },

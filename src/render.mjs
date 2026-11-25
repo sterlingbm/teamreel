@@ -29,7 +29,7 @@ export function timeline(story, voSecs) {
 }
 
 function launchArgs() {
-  const exe = process.env.SHIPREEL_CHROME;
+  const exe = process.env.TEAMREEL_CHROME;
   return { headless: true, ...(exe ? { executablePath: exe } : {}), args: ['--font-render-hinting=none', '--disable-lcd-text'] };
 }
 
@@ -42,7 +42,7 @@ export async function render({ story, avatars, voSecs, dir, out, vertical = fals
     browser = await chromium.launch(launchArgs());
   } catch {
     try { browser = await chromium.launch({ ...launchArgs(), channel: 'chrome' }); } catch (e) { // fall back to an installed Google Chrome
-    throw new Error(`Couldn't start Chromium (${e.message.split('\n')[0]}). Run \`npx playwright install chromium\` once, or set SHIPREEL_CHROME to a Chrome binary.`);
+    throw new Error(`Couldn't start Chromium (${e.message.split('\n')[0]}). Run \`npx playwright install chromium\` once, or set TEAMREEL_CHROME to a Chrome binary.`);
   } }
   const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
   const errors = [];

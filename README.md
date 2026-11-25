@@ -1,8 +1,8 @@
-# shipreel
+# TeamReel
 
 A week of merged pull requests, turned into a one-minute video your team will actually watch.
 
-shipreel reads what your team merged, picks the change that mattered most, and renders a short narrated video: the headline, the week in numbers, the big change and who built it, what else shipped, and shout-outs. Post it to Slack on Friday afternoon instead of another "here's the scoop" thread.
+teamreel reads what your team merged, picks the change that mattered most, and renders a short narrated video: the headline, the week in numbers, the big change and who built it, what else shipped, and shout-outs. Post it to Slack on Friday afternoon instead of another "here's the scoop" thread.
 
 - **Runs on your infrastructure.** A CLI and a GitHub Action. Your code and tickets never touch a server we run, because there isn't one.
 - **Bring your own key.** Claude, OpenAI or Gemini writes the script; Gemini or OpenAI reads it aloud. A video costs a few cents. No key at all still works: you get a plain script and captions.
@@ -14,25 +14,25 @@ shipreel reads what your team merged, picks the change that mattered most, and r
 npx playwright install chromium            # once
 export ANTHROPIC_API_KEY=...               # or OPENAI_API_KEY / GEMINI_API_KEY
 export GEMINI_API_KEY=...                  # optional, for the voice-over (or OPENAI_API_KEY)
-npx shipreel --repo your-org/api --repo your-org/web --team "Platform"
-open shipreel-out/shipreel.mp4
+npx teamreel --repo your-org/api --repo your-org/web --team "Platform"
+open teamreel-out/teamreel.mp4
 ```
 
 GitHub access comes from `GITHUB_TOKEN`, or from `gh auth login` if you have the GitHub CLI.
 
 ## Every Friday, in Slack
 
-Copy [`examples/weekly.yml`](examples/weekly.yml) to `.github/workflows/shipreel.yml`, add your keys as repository secrets, and set `slack-channel` to a channel ID. The Slack app needs the `files:write` scope and has to be invited to the channel.
+Copy [`examples/weekly.yml`](examples/weekly.yml) to `.github/workflows/teamreel.yml`, add your keys as repository secrets, and set `slack-channel` to a channel ID. The Slack app needs the `files:write` scope and has to be invited to the channel.
 
-To cover several repos, pass `repos: "acme/api acme/web"` or `org: acme`, and give the workflow a token that can read them (`GITHUB_TOKEN: ${{ secrets.SHIPREEL_GH_TOKEN }}` in `env`).
+To cover several repos, pass `repos: "acme/api acme/web"` or `org: acme`, and give the workflow a token that can read them (`GITHUB_TOKEN: ${{ secrets.TEAMREEL_GH_TOKEN }}` in `env`).
 
 ## Edit before you post
 
 ```bash
-shipreel --repo acme/api --dry              # collect + write the script only
-$EDITOR shipreel-out/story.json             # fix a title, cut a scene, change a line
-shipreel --story shipreel-out/story.json    # render exactly that
-shipreel --story shipreel-out/story.json --stills   # one frame per scene, for a quick look
+teamreel --repo acme/api --dry              # collect + write the script only
+$EDITOR teamreel-out/story.json             # fix a title, cut a scene, change a line
+teamreel --story teamreel-out/story.json    # render exactly that
+teamreel --story teamreel-out/story.json --stills   # one frame per scene, for a quick look
 ```
 
 ## Options
@@ -51,7 +51,7 @@ shipreel --story shipreel-out/story.json --stills   # one frame per scene, for a
 | `--no-captions`, `--no-mark` | | hide captions / the end credit |
 | `--slack CHANNEL_ID` | | post when done (`SLACK_BOT_TOKEN`) |
 
-Model and voice can be set with `SHIPREEL_MODEL`, `SHIPREEL_VOICE` and `SHIPREEL_TTS_MODEL`.
+Model and voice can be set with `TEAMREEL_MODEL`, `TEAMREEL_VOICE` and `TEAMREEL_TTS_MODEL`.
 
 ## How it works
 
@@ -62,7 +62,7 @@ Model and voice can be set with `SHIPREEL_MODEL`, `SHIPREEL_VOICE` and `SHIPREEL
 
 ## Requirements
 
-Node 20+, ffmpeg on the PATH, and Chromium from Playwright (or set `SHIPREEL_CHROME` to any Chrome).
+Node 20+, ffmpeg on the PATH, and Chromium from Playwright (or set `TEAMREEL_CHROME` to any Chrome).
 
 ## License
 

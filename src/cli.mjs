@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// shipreel — a week of merged PRs → a 60-second video update.
+// teamreel — a week of merged PRs → a 60-second video update.
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -10,24 +10,24 @@ import { pickVoice, voiceScenes } from './voice.mjs';
 import { render } from './render.mjs';
 import { postToSlack } from './slack.mjs';
 
-const HELP = `shipreel — turn a week of merged PRs into a short video update
+const HELP = `teamreel — turn a week of merged PRs into a short video update
 
 Usage
-  shipreel --repo owner/name [--repo owner/other] [options]
-  shipreel --org acme [options]
+  teamreel --repo owner/name [--repo owner/other] [options]
+  teamreel --org acme [options]
 
 Options
   --since 7d            window start: 7d, 2w or a date (default 7d)
   --until <date>        window end (default now)
   --team "Payments"     name shown in the video (default: the repos)
-  --out ./shipreel-out  where the video and its working files go
+  --out ./teamreel-out  where the video and its working files go
   --llm auto            anthropic | openai | gemini | none  (auto = first key found)
   --voice auto          gemini | openai | none              (auto = first key found)
   --vertical            1080x1920 instead of 1920x1080
   --accent "#ff7a45"    accent colour
   --music bed.mp3       optional music bed (you supply the file)
   --no-captions         hide the on-screen captions
-  --no-mark             hide "made with shipreel" on the last frame
+  --no-mark             hide "made with teamreel" on the last frame
   --story story.json    skip collecting and writing; render an edited story
   --stills              write review frames instead of the full video
   --slack <channel-id>  post the video to Slack (needs SLACK_BOT_TOKEN)
@@ -41,7 +41,7 @@ const { values: o } = parseArgs({
   options: {
     repo: { type: 'string', multiple: true, default: [] }, org: { type: 'string' },
     since: { type: 'string', default: '7d' }, until: { type: 'string' }, team: { type: 'string' },
-    out: { type: 'string', default: 'shipreel-out' }, llm: { type: 'string', default: 'auto' }, voice: { type: 'string', default: 'auto' },
+    out: { type: 'string', default: 'teamreel-out' }, llm: { type: 'string', default: 'auto' }, voice: { type: 'string', default: 'auto' },
     vertical: { type: 'boolean', default: false }, accent: { type: 'string' }, music: { type: 'string' },
     'no-captions': { type: 'boolean', default: false }, 'no-mark': { type: 'boolean', default: false },
     story: { type: 'string' }, stills: { type: 'boolean', default: false }, slack: { type: 'string' }, dry: { type: 'boolean', default: false },
@@ -50,7 +50,7 @@ const { values: o } = parseArgs({
 });
 if (o.help || (!o.repo.length && !o.org && !o.story)) { process.stdout.write(HELP); process.exit(o.help ? 0 : 2); }
 
-const log = (m) => process.stderr.write(`shipreel: ${m}\n`);
+const log = (m) => process.stderr.write(`teamreel: ${m}\n`);
 const dir = path.resolve(o.out);
 fs.mkdirSync(dir, { recursive: true });
 const save = (name, obj) => fs.writeFileSync(path.join(dir, name), JSON.stringify(obj, null, 2));
@@ -89,7 +89,7 @@ try {
     const { files } = await render({ ...opts, stills: tmp.scenes.map((s) => +(s.end - 0.5).toFixed(2)) });
     log(`stills: ${files.join(', ')}`);
   } else {
-    const out = path.join(dir, 'shipreel.mp4');
+    const out = path.join(dir, 'teamreel.mp4');
     const { duration } = await render({ ...opts, out });
     save('story.json', story);
     log(`done: ${out} (${duration.toFixed(1)}s)`);

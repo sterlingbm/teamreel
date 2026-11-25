@@ -1,6 +1,6 @@
 // voice.mjs — read each scene's narration aloud, on the team's own key.
 //
-//   GEMINI_API_KEY → Gemini TTS   (SHIPREEL_VOICE default "Charon")
+//   GEMINI_API_KEY → Gemini TTS   (TEAMREEL_VOICE default "Charon")
 //   OPENAI_API_KEY → OpenAI TTS   (default "alloy")
 //   none           → silent video with captions
 import fs from 'node:fs';
@@ -18,8 +18,8 @@ const STYLE = 'Warm, relaxed and clear, like a colleague giving a quick Friday r
 
 async function gemini(text) {
   // The style rides in a speech_metadata annotation; anything in the text itself gets read aloud.
-  const voice = process.env.SHIPREEL_VOICE || 'Charon';
-  const models = (process.env.SHIPREEL_TTS_MODEL || 'gemini-3.8-flash-tts,gemini-3.8-flash-lite-tts').split(',');
+  const voice = process.env.TEAMREEL_VOICE || 'Charon';
+  const models = (process.env.TEAMREEL_TTS_MODEL || 'gemini-3.8-flash-tts,gemini-3.8-flash-lite-tts').split(',');
   let last;
   for (const model of models) {
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -51,7 +51,7 @@ async function openai(text) {
   const res = await fetch('https://api.openai.com/v1/audio/speech', {
     method: 'POST',
     headers: { authorization: `Bearer ${process.env.OPENAI_API_KEY}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ model: process.env.SHIPREEL_TTS_MODEL || 'gpt-4o-mini-tts', voice: process.env.SHIPREEL_VOICE || 'alloy',
+    body: JSON.stringify({ model: process.env.TEAMREEL_TTS_MODEL || 'gpt-4o-mini-tts', voice: process.env.TEAMREEL_VOICE || 'alloy',
       input: text, instructions: STYLE, response_format: 'pcm' }),
   });
   if (!res.ok) throw new Error(`openai tts ${res.status}: ${(await res.text()).slice(0, 200)}`);

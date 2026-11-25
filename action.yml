@@ -1,4 +1,4 @@
-name: shipreel
+name: teamreel
 description: Turn a week of merged PRs into a short video update and post it to Slack.
 branding: { icon: film, color: orange }
 inputs:
@@ -24,7 +24,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN || github.token }}
       run: |
-        args=(--since "${{ inputs.since }}" --out "$RUNNER_TEMP/shipreel")
+        args=(--since "${{ inputs.since }}" --out "$RUNNER_TEMP/teamreel")
         if [ -n "${{ inputs.org }}" ]; then args+=(--org "${{ inputs.org }}");
         else for r in ${{ inputs.repos || github.repository }}; do args+=(--repo "$r"); done; fi
         [ -n "${{ inputs.team }}" ] && args+=(--team "${{ inputs.team }}")
@@ -32,4 +32,4 @@ runs:
         [ "${{ inputs.vertical }}" = "true" ] && args+=(--vertical)
         [ -n "${{ inputs.slack-channel }}" ] && args+=(--slack "${{ inputs.slack-channel }}")
         node "${{ github.action_path }}/src/cli.mjs" "${args[@]}"
-        echo "video=$RUNNER_TEMP/shipreel/shipreel.mp4" >> "$GITHUB_OUTPUT"
+        echo "video=$RUNNER_TEMP/teamreel/teamreel.mp4" >> "$GITHUB_OUTPUT"

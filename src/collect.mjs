@@ -19,7 +19,7 @@ export function githubToken() {
 async function gql(token, query, variables) {
   const res = await fetch('https://api.github.com/graphql', {
     method: 'POST',
-    headers: { authorization: `bearer ${token}`, 'content-type': 'application/json', 'user-agent': 'shipreel' },
+    headers: { authorization: `bearer ${token}`, 'content-type': 'application/json', 'user-agent': 'teamreel' },
     body: JSON.stringify({ query, variables }),
   });
   const body = await res.json().catch(() => ({}));
