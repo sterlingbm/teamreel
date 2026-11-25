@@ -1,0 +1,9 @@
+{
+  "company": "Northwind",
+  "post_to": "#company-updates",
+  "teams": [
+    { "name": "Payments", "about": "9 people", "color": "#6b4eff", "jira": { "projects": ["PAY"] }, "slack": ["#payments"] },
+    { "name": "Sales", "about": "14 people", "color": "#ff5a1f", "slack": ["#sales-wins", "#sales"] },
+    { "name": "Product", "about": "CRM app", "color": "#c6f432", "github": ["twentyhq/twenty"] }
+  ]
+}

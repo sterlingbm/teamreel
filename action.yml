@@ -1,14 +1,11 @@
-name: teamreel
-description: Turn a week of merged PRs into a short video update and post it to Slack.
+name: TeamReel
+description: What every team shipped this week, as a short video posted to Slack.
 branding: { icon: film, color: orange }
 inputs:
-  repos:        { description: 'Space-separated owner/name list (default: this repo)', required: false, default: '' }
-  org:          { description: 'Use every repo in this org instead', required: false, default: '' }
-  since:        { description: 'Window, e.g. 7d or 2w', required: false, default: '7d' }
-  team:         { description: 'Name shown in the video', required: false, default: '' }
-  slack-channel: { description: 'Slack channel ID to post to (needs SLACK_BOT_TOKEN env)', required: false, default: '' }
-  vertical:     { description: 'true for 1080x1920', required: false, default: 'false' }
-  accent:       { description: 'Accent colour', required: false, default: '' }
+  config: { description: 'Path to teamreel.json', required: false, default: 'teamreel.json' }
+  since:  { description: 'Window, e.g. 7d or 2w', required: false, default: '7d' }
+  post:   { description: 'Post to the config''s post_to channel', required: false, default: 'true' }
+  vertical: { description: 'true for 1080x1920', required: false, default: 'false' }
 outputs:
   video: { description: 'Path to the rendered mp4', value: '${{ steps.run.outputs.video }}' }
 runs:
@@ -17,6 +14,8 @@ runs:
     - uses: actions/setup-node@v4
       with: { node-version: 22 }
     - shell: bash
+      run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+    - shell: bash
       working-directory: ${{ github.action_path }}
       run: npm ci --omit=dev --no-audit --no-fund && npx playwright install --with-deps chromium
     - id: run
@@ -24,12 +23,8 @@ runs:
       env:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN || github.token }}
       run: |
-        args=(--since "${{ inputs.since }}" --out "$RUNNER_TEMP/teamreel")
-        if [ -n "${{ inputs.org }}" ]; then args+=(--org "${{ inputs.org }}");
-        else for r in ${{ inputs.repos || github.repository }}; do args+=(--repo "$r"); done; fi
-        [ -n "${{ inputs.team }}" ] && args+=(--team "${{ inputs.team }}")
-        [ -n "${{ inputs.accent }}" ] && args+=(--accent "${{ inputs.accent }}")
+        args=(--config "${{ inputs.config }}" --since "${{ inputs.since }}" --out "$RUNNER_TEMP/teamreel")
+        [ "${{ inputs.post }}" = "true" ] && args+=(--post)
         [ "${{ inputs.vertical }}" = "true" ] && args+=(--vertical)
-        [ -n "${{ inputs.slack-channel }}" ] && args+=(--slack "${{ inputs.slack-channel }}")
         node "${{ github.action_path }}/src/cli.mjs" "${args[@]}"
         echo "video=$RUNNER_TEMP/teamreel/teamreel.mp4" >> "$GITHUB_OUTPUT"

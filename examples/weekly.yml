@@ -1,21 +1,22 @@
-# .github/workflows/teamreel.yml — a video of the week's merged PRs, every Friday at 4pm UTC.
-name: Weekly teamreel
+# .github/workflows/teamreel.yml — every Friday at 4pm UTC, post the week's reel to Slack.
+name: Weekly TeamReel
 on:
   schedule: [{ cron: '0 16 * * 5' }]
   workflow_dispatch:
 jobs:
   reel:
     runs-on: ubuntu-latest
-    permissions: { contents: read, pull-requests: read, issues: read }
     steps:
+      - uses: actions/checkout@v4          # for teamreel.json
       - id: reel
         uses: sterlingbm/teamreel@v0
-        with:
-          team: Platform
-          slack-channel: C0123456789        # optional
         env:
+          GITHUB_TOKEN: ${{ secrets.TEAMREEL_GITHUB_TOKEN }}   # read access to the repos in your config
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}   # or OPENAI_API_KEY / GEMINI_API_KEY
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}         # optional: voice-over (or OPENAI_API_KEY)
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}       # optional
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}         # optional: generated music
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
+          JIRA_EMAIL: ${{ vars.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
       - uses: actions/upload-artifact@v4
         with: { name: teamreel, path: '${{ steps.reel.outputs.video }}' }

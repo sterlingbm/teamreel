@@ -1,68 +1,99 @@
 # TeamReel
 
-A week of merged pull requests, turned into a one-minute video your team will actually watch.
+**What every team shipped this week, in one fast video your whole company will watch.**
 
-teamreel reads what your team merged, picks the change that mattered most, and renders a short narrated video: the headline, the week in numbers, the big change and who built it, what else shipped, and shout-outs. Post it to Slack on Friday afternoon instead of another "here's the scoop" thread.
+![TeamReel preview](docs/preview.gif)
 
-- **Runs on your infrastructure.** A CLI and a GitHub Action. Your code and tickets never touch a server we run, because there isn't one.
-- **Bring your own key.** Claude, OpenAI or Gemini writes the script; Gemini or OpenAI reads it aloud. A video costs a few cents. No key at all still works: you get a plain script and captions.
-- **It can't make things up.** Every number on screen is counted from GitHub, every PR and person the script names is checked against the data, and any narration that states a number we didn't count is thrown out.
+Nobody reads the fifth "here's the scoop" thread of the week. TeamReel reads it for them. Every Friday it goes through each team's merged pull requests, finished Jira tickets and public Slack channels, picks out what the rest of the company should know, and posts a 40-second reel to Slack:
 
-## Quick start
+- **What launched**, in plain words: "Customers can now pay with Apple Pay in 12 countries", not "feat(checkout): add PKPaymentButton".
+- **The numbers that moved**: conversion up, a deal signed, quota hit.
+- **Progress on goals**: "81% of the way to the Q4 target."
+- **Who made it happen**, with their faces from Slack.
+- **What's next** for each team.
 
-```bash
-npx playwright install chromium            # once
-export ANTHROPIC_API_KEY=...               # or OPENAI_API_KEY / GEMINI_API_KEY
-export GEMINI_API_KEY=...                  # optional, for the voice-over (or OPENAI_API_KEY)
-npx teamreel --repo your-org/api --repo your-org/web --team "Platform"
-open teamreel-out/teamreel.mp4
+An AI editor reads the code and the conversation the way a good chief of staff would. It turns a dozen PRs into one feature, skips refactors and dependency bumps, and credits everyone who worked on it.
+
+## Nothing made up
+
+Every number on screen has to appear, as written, in a PR, ticket or Slack post. Every person credited has to appear in the work behind that item. Anything that fails a check is dropped, not reworded. The Slack post links each item to its source.
+
+## Runs on your infrastructure
+
+TeamReel is a command-line tool and a GitHub Action. It runs where you run it, with your own API keys. Your code, tickets and messages go to GitHub, Jira, Slack and the AI provider you choose, and nowhere else. There's no TeamReel server.
+
+A reel costs a few cents in API calls.
+
+## Set up (10 minutes)
+
+**1. Describe your teams** in `teamreel.json`:
+
+```json
+{
+  "company": "Northwind",
+  "post_to": "#company-updates",
+  "teams": [
+    { "name": "Payments", "about": "9 people", "jira": { "projects": ["PAY"] }, "slack": ["#payments"], "github": ["northwind/payments-api"] },
+    { "name": "Sales", "about": "14 people", "slack": ["#sales-wins", "#sales"] },
+    { "name": "Product", "github": ["northwind/web", "northwind/ios"] }
+  ]
+}
 ```
 
-GitHub access comes from `GITHUB_TOKEN`, or from `gh auth login` if you have the GitHub CLI.
+Any team can use any mix of sources. Sales and marketing usually live in Slack, engineering in GitHub and Jira.
 
-## Every Friday, in Slack
+**2. Create a Slack app** with the bot scopes `channels:history`, `channels:read`, `users:read`, `files:read` and `files:write`, install it, and invite it to the channels it reads and the one it posts in.
 
-Copy [`examples/weekly.yml`](examples/weekly.yml) to `.github/workflows/teamreel.yml`, add your keys as repository secrets, and set `slack-channel` to a channel ID. The Slack app needs the `files:write` scope and has to be invited to the channel.
+**3. Add your keys:**
 
-To cover several repos, pass `repos: "acme/api acme/web"` or `org: acme`, and give the workflow a token that can read them (`GITHUB_TOKEN: ${{ secrets.TEAMREEL_GH_TOKEN }}` in `env`).
+| | |
+|---|---|
+| `SLACK_BOT_TOKEN` | the Slack app's bot token |
+| `GITHUB_TOKEN` | read access to the repos in your config |
+| `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` | if you use Jira Cloud |
+| `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` or `GEMINI_API_KEY` | the editor |
+| `GEMINI_API_KEY` | optional, generates the music |
 
-## Edit before you post
+**4. Run it every Friday.** Copy [`examples/weekly.yml`](examples/weekly.yml) into `.github/workflows/`, or run it yourself:
 
 ```bash
-teamreel --repo acme/api --dry              # collect + write the script only
-$EDITOR teamreel-out/story.json             # fix a title, cut a scene, change a line
-teamreel --story teamreel-out/story.json    # render exactly that
-teamreel --story teamreel-out/story.json --stills   # one frame per scene, for a quick look
+npx playwright install chromium     # once
+npx teamreel --config teamreel.json --post
 ```
+
+## Review before it posts
+
+```bash
+teamreel --config teamreel.json --dry          # collect + edit; writes story.json
+$EDITOR teamreel-out/story.json                # change a headline, cut a scene
+teamreel --story teamreel-out/story.json --post
+```
+
+`--stills` writes one frame per scene for a quick look. `--vertical` renders 1080×1920 for phones.
 
 ## Options
 
-| Flag | Default | |
-|---|---|---|
-| `--repo owner/name` | | repeat for several repos |
-| `--org name` | | every repo in an org |
-| `--since` | `7d` | `7d`, `2w`, or a date |
-| `--team` | repo names | shown in the video |
-| `--llm` | auto | `anthropic`, `openai`, `gemini`, `none` |
-| `--voice` | auto | `gemini`, `openai`, `none` |
-| `--vertical` | off | 1080×1920 for phones |
-| `--accent` | `#ff7a45` | accent colour |
-| `--music file.mp3` | none | a music bed you supply |
-| `--no-captions`, `--no-mark` | | hide captions / the end credit |
-| `--slack CHANNEL_ID` | | post when done (`SLACK_BOT_TOKEN`) |
+| Flag | |
+|---|---|
+| `--config teamreel.json` | teams and their sources |
+| `--since 7d` | the window: `7d`, `2w`, or a date |
+| `--post` | post to `post_to` when done |
+| `--dry` | stop after writing `story.json` |
+| `--story story.json` | render an edited story |
+| `--llm auto` | `anthropic`, `openai`, `gemini`, or `none` |
+| `--music file.mp3`, `--no-music` | your own track, or none |
+| `--vertical`, `--stills`, `--no-captions` | |
+| `--fixtures dir` | read sources from JSON files (for trying it without accounts) |
 
-Model and voice can be set with `TEAMREEL_MODEL`, `TEAMREEL_VOICE` and `TEAMREEL_TTS_MODEL`.
+Try it with no accounts at all:
 
-## How it works
-
-1. **Collect.** One GitHub GraphQL search for merged PRs and closed issues in the window. Bots are dropped. Avatars are inlined so rendering needs no network.
-2. **Write.** The model gets titles, sizes, labels and the first part of each PR description, and returns a script with one main story. Code checks every pick against the data.
-3. **Voice.** Each scene's line is read separately and trimmed, and scene lengths follow the voice.
-4. **Render.** An HTML template is stepped frame by frame in headless Chromium and piped to ffmpeg, so the output is identical every run. About two minutes for a one-minute video on a laptop.
+```bash
+npx teamreel --config examples/teamreel.example.json --fixtures examples/fixtures --llm none
+```
 
 ## Requirements
 
-Node 20+, ffmpeg on the PATH, and Chromium from Playwright (or set `TEAMREEL_CHROME` to any Chrome).
+Node 20+, ffmpeg, and Chromium from Playwright (or any Chrome via `TEAMREEL_CHROME`).
 
 ## License
 

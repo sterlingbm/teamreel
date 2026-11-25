@@ -24,20 +24,34 @@ const day = (d) => d.toISOString().slice(0, 10);
 export async function jiraSignals({ jira, since, until }) {
   if (!jira?.projects?.length) return { signals: [], people: {} };
   const { base, header } = auth();
-  const jql = `project in (${jira.projects.map((p) => `"${p}"`).join(',')}) AND statusCategory = Done AND statusCategoryChangedDate >= "${day(since)}" AND statusCategoryChangedDate <= "${day(until)} 23:59"${jira.jql ? ` AND (${jira.jql})` : ''} ORDER BY priority DESC`;
-  const issues = [];
-  let next;
-  do {
-    const res = await fetch(`${base}/rest/api/3/search/jql`, {
-      method: 'POST',
-      headers: { authorization: header, accept: 'application/json', 'content-type': 'application/json' },
-      body: JSON.stringify({ jql, maxResults: 100, nextPageToken: next, fields: ['summary', 'description', 'issuetype', 'assignee', 'parent', 'labels', 'statuscategorychangedate', 'attachment'] }),
-    });
-    if (!res.ok) throw new Error(`Jira ${res.status}: ${(await res.text()).slice(0, 200)}`);
-    const d = await res.json();
-    issues.push(...d.issues);
-    next = d.nextPageToken;
-  } while (next && issues.length < 300);
+  const scope = `project in (${jira.projects.map((p) => `"${p}"`).join(',')}) AND statusCategory = Done`;
+  const extra = jira.jql ? ` AND (${jira.jql})` : '';
+  const window = (field) => ` AND ${field} >= "${day(since)}" AND ${field} <= "${day(until)} 23:59"`;
+  const run = async (jql) => {
+    const issues = [], seen = new Set();
+    let next;
+    do {
+      const res = await fetch(`${base}/rest/api/3/search/jql`, {
+        method: 'POST',
+        headers: { authorization: header, accept: 'application/json', 'content-type': 'application/json' },
+        body: JSON.stringify({ jql, maxResults: 100, ...(next ? { nextPageToken: next } : {}), fields: ['summary', 'description', 'issuetype', 'assignee', 'parent', 'labels', 'statuscategorychangedate', 'resolutiondate'] }),
+      });
+      if (!res.ok) { const e = new Error(`Jira ${res.status}: ${(await res.text()).slice(0, 200)}`); e.status = res.status; throw e; }
+      const d = await res.json();
+      issues.push(...d.issues);
+      next = d.isLast === false || d.nextPageToken ? d.nextPageToken : null;
+      if (next && seen.has(next)) break; // some sites hand back the same token forever
+      if (next) seen.add(next);
+    } while (next && issues.length < 300);
+    return issues;
+  };
+  let issues;
+  try {
+    issues = await run(`${scope}${window('statusCategoryChangedDate')}${extra} ORDER BY priority DESC`);
+  } catch (e) {
+    if (e.status !== 400) throw e;
+    issues = await run(`${scope}${window('resolved')}${extra} ORDER BY priority DESC`); // older sites: resolution date
+  }
 
   const people = {};
   const signals = issues.map((i) => {
@@ -50,7 +64,7 @@ export async function jiraSignals({ jira, since, until }) {
       text: [f.parent ? `Part of: ${f.parent.fields?.summary ?? f.parent.key}` : '', adf(f.description).trim()].filter(Boolean).join('\n').slice(0, 1200),
       people: a ? [`jira:${a.accountId}`] : [],
       url: `${base}/browse/${i.key}`,
-      date: f.statuscategorychangedate,
+      date: f.statuscategorychangedate ?? f.resolutiondate,
       media: [], // Jira attachments need auth to fetch; screenshots usually live in the PR anyway
       meta: { type: f.issuetype?.name, labels: f.labels, epic: f.parent?.fields?.summary },
     };

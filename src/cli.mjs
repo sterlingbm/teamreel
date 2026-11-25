@@ -10,6 +10,7 @@ import { pickLlm } from './llm.mjs';
 import { editTeam } from './editor.mjs';
 import { buildReel, reelSummary } from './reel.mjs';
 import { render, timeline } from './render.mjs';
+import { makeMusic } from './music.mjs';
 
 const HELP = `teamreel — what every team shipped this week, as a short video in Slack
 
@@ -27,7 +28,7 @@ Options
   --until <date>        window end (default now)
   --out ./teamreel-out  working files and the video
   --llm auto            anthropic | openai | gemini | none
-  --music bed.mp3       music bed (you supply it)
+  --music bed.mp3       your own music bed (default: generated on your Gemini key; --no-music for none)
   --vertical            1080x1920
   --post                post to the config's post_to channel when done
   --dry                 collect and edit only; write story.json
@@ -45,7 +46,7 @@ const { values: o } = parseArgs({
     since: { type: 'string', default: '7d' }, until: { type: 'string' }, out: { type: 'string', default: 'teamreel-out' },
     llm: { type: 'string', default: 'auto' }, music: { type: 'string' }, vertical: { type: 'boolean', default: false },
     post: { type: 'boolean', default: false }, dry: { type: 'boolean', default: false }, story: { type: 'string' },
-    stills: { type: 'boolean', default: false }, fixtures: { type: 'string' }, 'no-captions': { type: 'boolean', default: false },
+    stills: { type: 'boolean', default: false }, fixtures: { type: 'string' }, 'no-captions': { type: 'boolean', default: false }, 'no-music': { type: 'boolean', default: false },
     help: { type: 'boolean', short: 'h', default: false },
   },
 });
@@ -124,6 +125,10 @@ try {
     log(`stills: ${files.length} in ${dir}`);
   } else {
     const out = path.join(dir, 'teamreel.mp4');
+    if (!opts.music && !o['no-music']) {
+      const tmp = structuredClone(story);
+      opts.music = await makeMusic(timeline(tmp, voSecs) + 2, dir, log);
+    }
     const { duration } = await render({ ...opts, out });
     log(`done: ${out} (${duration.toFixed(1)}s)`);
     if (o.post) {

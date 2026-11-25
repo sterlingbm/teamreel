@@ -1,13 +1,37 @@
 {
   "name": "teamreel",
   "version": "0.1.0",
-  "description": "Turn a week of merged PRs into a 60-second video update for your team. Self-hosted, bring your own API key.",
+  "description": "What every team shipped this week, as a short video posted to Slack. Reads GitHub, Jira and Slack; self-hosted, bring your own AI key.",
   "type": "module",
-  "bin": { "teamreel": "src/cli.mjs" },
-  "files": ["src", "template", "action.yml", "README.md", "LICENSE"],
-  "engines": { "node": ">=20" },
+  "bin": {
+    "teamreel": "src/cli.mjs"
+  },
+  "files": [
+    "src",
+    "template",
+    "action.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "license": "MIT",
   "dependencies": {
     "playwright": "1.59.1"
-  }
+  },
+  "keywords": [
+    "slack",
+    "jira",
+    "github",
+    "team-updates",
+    "video",
+    "internal-comms",
+    "changelog"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sterlingbm/teamreel.git"
+  },
+  "homepage": "https://github.com/sterlingbm/teamreel"
 }
