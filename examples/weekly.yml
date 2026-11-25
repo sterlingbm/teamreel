@@ -1,0 +1,21 @@
+# .github/workflows/shipreel.yml — a video of the week's merged PRs, every Friday at 4pm UTC.
+name: Weekly shipreel
+on:
+  schedule: [{ cron: '0 16 * * 5' }]
+  workflow_dispatch:
+jobs:
+  reel:
+    runs-on: ubuntu-latest
+    permissions: { contents: read, pull-requests: read, issues: read }
+    steps:
+      - id: reel
+        uses: sterlingbm/shipreel@v0
+        with:
+          team: Platform
+          slack-channel: C0123456789        # optional
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}   # or OPENAI_API_KEY / GEMINI_API_KEY
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}         # optional: voice-over (or OPENAI_API_KEY)
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}       # optional
+      - uses: actions/upload-artifact@v4
+        with: { name: shipreel, path: '${{ steps.reel.outputs.video }}' }

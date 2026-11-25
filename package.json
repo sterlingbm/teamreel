@@ -1,0 +1,13 @@
+{
+  "name": "shipreel",
+  "version": "0.1.0",
+  "description": "Turn a week of merged PRs into a 60-second video update for your team. Self-hosted, bring your own API key.",
+  "type": "module",
+  "bin": { "shipreel": "src/cli.mjs" },
+  "files": ["src", "template", "action.yml", "README.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "1.59.1"
+  }
+}
