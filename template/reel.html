@@ -1,0 +1,213 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500;12..96,75..100,700;12..96,75..100,800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<style>
+  :root { --paper: #f6f3ec; --ink: #121212; --c: #6b4eff; --c2: #ffd84d; --u: 1vw;
+    --disp: 'Bricolage Grotesque', system-ui, sans-serif; --mono: 'JetBrains Mono', Menlo, monospace; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--paper); color: var(--ink); font-family: var(--disp); -webkit-font-smoothing: antialiased; }
+  body.v { --u: calc(1vw * 1.7); }
+
+  .scene { position: absolute; inset: 0; overflow: hidden; visibility: hidden; }
+  .cam { position: absolute; inset: 0; transform-origin: 50% 50%; }
+  .fill { position: absolute; inset: 0; }
+
+  .tag { position: absolute; top: calc(var(--u) * 3); left: calc(var(--u) * 4); display: flex; align-items: center; gap: calc(var(--u) * 1);
+    font-family: var(--mono); font-weight: 700; font-size: calc(var(--u) * 1.15); letter-spacing: .12em; text-transform: uppercase; }
+  .tag i { width: calc(var(--u) * 1.1); height: calc(var(--u) * 1.1); border-radius: 50%; background: currentColor; display: inline-block; }
+  .tag.r { left: auto; right: calc(var(--u) * 4); opacity: .7; }
+
+  .slam { font-weight: 800; font-variation-settings: 'wdth' 82, 'opsz' 96; letter-spacing: -.035em; line-height: .88; text-transform: uppercase; }
+  .w { display: inline-block; white-space: pre; will-change: transform; }
+
+  /* hook */
+  .hook .fill { background: var(--ink); }
+  .hook .big { position: absolute; left: calc(var(--u) * 4); right: calc(var(--u) * 4); top: 50%; transform: translateY(-50%); color: var(--paper); font-size: calc(var(--u) * 10.5); }
+  .hook .big .hl { color: var(--c2); }
+
+  /* team card */
+  .team .fill { background: var(--c); }
+  .team .name { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * 6); color: var(--fg); font-size: calc(var(--u) * 17); }
+  .team .sub { position: absolute; left: calc(var(--u) * 4.4); top: calc(var(--u) * 9); color: var(--fg); font-family: var(--mono); font-size: calc(var(--u) * 1.6); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+
+  /* launch */
+  .launch .fill { background: var(--paper); }
+  .launch .kick { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 10); font-family: var(--mono); font-weight: 700; font-size: calc(var(--u) * 1.4); letter-spacing: .1em; text-transform: uppercase; background: var(--c); color: var(--fg); padding: .35em .7em; border-radius: 99px; }
+  .launch h2 { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 15); width: 50%; font-weight: 800; font-size: calc(var(--u) * 5.8); line-height: .95; letter-spacing: -.035em; font-variation-settings: 'wdth' 85, 'opsz' 96; }
+  .launch .shot { position: absolute; right: calc(var(--u) * 5); top: 50%; width: calc(var(--u) * 38); transform-origin: 50% 50%; }
+  .mini { width: calc(var(--u) * 4); } .mini .face { border-radius: 50%; font-size: calc(var(--u) * 1.5); }
+  .launch .who { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * 5); display: flex; align-items: center; gap: calc(var(--u) * 1.2); font-size: calc(var(--u) * 1.6); font-weight: 700; }
+
+  /* product mock: a browser/phone card drawn in HTML */
+  .frame { background: #fff; border-radius: calc(var(--u) * 1.6); box-shadow: 0 calc(var(--u) * 3) calc(var(--u) * 6) rgba(0,0,0,.22), 0 0 0 1px rgba(0,0,0,.06); overflow: hidden; }
+  .frame .bar { height: calc(var(--u) * 2.4); background: #efede8; display: flex; align-items: center; gap: calc(var(--u) * .5); padding: 0 calc(var(--u) * 1); }
+  .frame .bar b { width: calc(var(--u) * .7); height: calc(var(--u) * .7); border-radius: 50%; background: #d4d0c8; }
+  .frame .body { padding: calc(var(--u) * 2.4); font-family: var(--disp); }
+  .frame img { display: block; width: 100%; }
+
+  /* metric */
+  .metric .fill { background: var(--ink); }
+  .metric .lbl { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 10); color: var(--paper); font-family: var(--mono); font-weight: 700; font-size: calc(var(--u) * 1.6); letter-spacing: .1em; text-transform: uppercase; opacity: .75; }
+  .metric .num { position: absolute; left: calc(var(--u) * 3.4); top: calc(var(--u) * 13); color: var(--paper); font-size: calc(var(--u) * 17); font-weight: 800; letter-spacing: -.05em; font-variation-settings: 'wdth' 80, 'opsz' 96; font-variant-numeric: tabular-nums; line-height: 1; }
+  .metric .delta { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * 8.6); background: var(--c2); color: var(--ink); font-weight: 800; font-size: calc(var(--u) * 3.4); padding: .1em .45em; border-radius: calc(var(--u) * .8); letter-spacing: -.02em; }
+  .metric .from { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * 5.2); color: var(--paper); opacity: .6; font-family: var(--mono); font-size: calc(var(--u) * 1.4); }
+  .metric svg { position: absolute; right: calc(var(--u) * 4); bottom: calc(var(--u) * 6); width: 46%; height: 52%; overflow: visible; }
+
+  /* goal */
+  .goal .fill { background: var(--c); }
+  .goal .lbl { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 10); color: var(--fg); font-family: var(--mono); font-weight: 700; font-size: calc(var(--u) * 1.6); letter-spacing: .1em; text-transform: uppercase; }
+  .goal h3 { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 14); width: 80%; color: var(--fg); font-size: calc(var(--u) * 6.4); font-weight: 800; letter-spacing: -.035em; line-height: .95; font-variation-settings: 'wdth' 85, 'opsz' 96; }
+  .goal .track { position: absolute; left: calc(var(--u) * 4); right: calc(var(--u) * 4); bottom: calc(var(--u) * 9.4); height: calc(var(--u) * 5.2); border-radius: 99px; background: color-mix(in srgb, var(--fg) 18%, transparent); overflow: hidden; }
+  .goal .track b { position: absolute; inset: 0; background: var(--fg); transform-origin: left; border-radius: 99px; }
+  .goal .pct { position: absolute; right: calc(var(--u) * 4); bottom: calc(var(--u) * 15.4); color: var(--fg); font-size: calc(var(--u) * 7); font-weight: 800; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+  .goal .note { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * 5.4); color: var(--fg); font-family: var(--mono); font-size: calc(var(--u) * 1.4); opacity: .8; }
+
+  /* people */
+  .people .fill { background: var(--paper); }
+  .people h3 { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 10); font-size: calc(var(--u) * 6); }
+  .people .row { position: absolute; left: calc(var(--u) * 4); right: calc(var(--u) * 4); bottom: calc(var(--u) * 7); display: flex; gap: calc(var(--u) * 2.4); }
+  .person { flex: 1; }
+  .face { width: 100%; aspect-ratio: 1; border-radius: calc(var(--u) * 2); display: grid; place-items: center; font-weight: 800; font-size: calc(var(--u) * 7); color: var(--fg); background: var(--c); overflow: hidden; }
+  .face img { width: 100%; height: 100%; object-fit: cover; }
+  .person .n { margin-top: calc(var(--u) * 1); font-weight: 800; font-size: calc(var(--u) * 2.2); letter-spacing: -.02em; }
+  .person .r { font-family: var(--mono); font-size: calc(var(--u) * 1.2); opacity: .65; margin-top: calc(var(--u) * .3); }
+
+  /* outro */
+  .outro .fill { background: var(--ink); }
+  .outro .big { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 12); color: var(--paper); font-size: calc(var(--u) * 9); }
+  .outro .next { position: absolute; left: calc(var(--u) * 4); right: calc(var(--u) * 4); bottom: calc(var(--u) * 6); display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * 1.6); }
+  .outro .next div { border-top: 3px solid var(--c2); padding-top: calc(var(--u) * 1); color: var(--paper); font-size: calc(var(--u) * 1.9); font-weight: 700; line-height: 1.15; }
+  .outro .next div span { display: block; font-family: var(--mono); font-size: calc(var(--u) * 1.1); color: var(--c2); letter-spacing: .1em; text-transform: uppercase; margin-bottom: .5em; }
+
+  #cap { position: absolute; left: 50%; bottom: calc(var(--u) * 1.2); transform: translateX(-50%); z-index: 9; font-weight: 700; font-size: calc(var(--u) * 1.5); white-space: nowrap; }
+  #cap span { background: var(--ink); color: var(--paper); padding: .2em .55em; border-radius: 6px; }
+  #wipe { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="wipe"></div>
+<div id="cap"></div>
+<script>
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const clamp = (x) => Math.max(0, Math.min(1, x));
+const out3 = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const back = (x) => { x = clamp(x); const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const expo = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x)));
+const lum = (hex) => { const n = parseInt(hex.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; };
+
+// data-a: slam (scale overshoot) | pop | up | left | fly (3D product card) | draw (svg path) | fillx | count | fade
+const A = (a, d, x = '') => `data-a="${a}" data-d="${d}" ${x}`;
+const words = (text, d0, step = .07, a = 'slam', hl = []) => String(text).split(/\s+/).map((w, i) =>
+  `<span class="w${hl.includes(w.replace(/[^\w$%]/g, '')) ? ' hl' : ''}" ${A(a, d0 + i * step)}>${esc(w)} </span>`).join('');
+const initials = (n) => n.split(/\s+/).map((x) => x[0]).slice(0, 2).join('').toUpperCase();
+
+let AV = {};
+const face = (p) => AV[p.login ?? p.name] ? `<div class="face"><img src="${AV[p.login ?? p.name]}"></div>` : `<div class="face">${esc(initials(p.name))}</div>`;
+const tag = (s) => s.team ? `<div class="tag" style="color:${s.onPaper ? 'var(--ink)' : 'var(--fg)'}"><i style="color:var(--c)"></i>${esc(s.team)}</div>` : '';
+
+function spark(points, w = 100, h = 60) {
+  const min = Math.min(...points), max = Math.max(...points), n = points.length - 1;
+  return points.map((v, i) => `${i ? 'L' : 'M'}${(i / n) * w},${h - ((v - min) / (max - min || 1)) * h}`).join(' ');
+}
+
+const BUILD = {
+  hook: (s) => `<div class="fill"></div><div class="tag r" style="color:var(--paper)">${esc(s.date)}</div>
+    <div class="big slam">${s.lines.map((l, i) => `<div>${words(l, .1 + i * .55, .08, 'slam', s.highlight ?? [])}</div>`).join('')}</div>`,
+  team: (s) => `<div class="fill"></div>
+    <div class="sub" ${A('up', .25)}>${esc(s.sub)}</div>
+    <div class="name slam">${words(s.team, .05, .09)}</div>`,
+  launch: (s) => `<div class="fill"></div>${tag({ ...s, onPaper: true })}
+    <div class="kick" ${A('pop', .05)}>${esc(s.kicker || 'Launched')}</div>
+    <h2>${words(s.headline, .25, .06, 'up')}</h2>
+    <div class="shot" ${A('fly', .35)}><div class="frame"><div class="bar"><b></b><b></b><b></b></div>${s.image ? `<img src="${s.image}">` : `<div class="body">${s.mock || ''}</div>`}</div></div>
+    <div class="who" ${A('up', 1.4)}>${(s.people || []).slice(0, 3).map((p) => `<div class="mini">${face(p)}</div>`).join('')}<span>${esc((s.people || []).map((p) => p.name.split(' ')[0]).join(', '))}</span></div>`,
+  metric: (s) => `<div class="fill"></div>${tag(s)}
+    <div class="lbl" ${A('fade', .05)}>${esc(s.label)}</div>
+    <div class="num" ${A('count', .15, `data-from="${s.from}" data-to="${s.to}" data-fmt="${esc(s.fmt || '{}')}" data-dp="${s.dp ?? 0}"`)}>${esc(s.from)}</div>
+    <div class="delta" ${A('slam', 1.3)}>${esc(s.delta)}</div>
+    <div class="from" ${A('fade', 1.5)}>${esc(s.note || '')}</div>
+    <svg viewBox="0 0 100 60" preserveAspectRatio="none" ${A('reveal', .2)}><path d="${spark(s.series)}" fill="none" stroke="var(--c2)" stroke-width="5" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>`,
+  goal: (s) => `<div class="fill"></div>${tag(s)}
+    <div class="lbl" ${A('fade', .05)}>${esc(s.label || 'Goal')}</div>
+    <h3>${words(s.goal, .15, .06, 'up')}</h3>
+    <div class="pct" ${A('count', .6, `data-from="0" data-to="${s.pct}" data-fmt="{}%"`)}>0%</div>
+    <div class="track"><b ${A('fillx', .6, `data-to="${s.pct / 100}"`)}></b></div>
+    <div class="note" ${A('fade', 1.4)}>${esc(s.note || '')}</div>`,
+  people: (s) => `<div class="fill"></div>${tag({ ...s, onPaper: true })}
+    <h3 class="slam">${words(s.title || 'Who made it happen', .05, .07)}</h3>
+    <div class="row">${s.people.map((p, i) => `<div class="person" ${A('pop', .35 + i * .12)}>${face(p)}<div class="n">${esc(p.name)}</div><div class="r">${esc(p.role || '')}</div></div>`).join('')}</div>`,
+  outro: (s) => `<div class="fill"></div>
+    <div class="big slam">${words(s.line, .05, .08)}</div>
+    <div class="next">${(s.next || []).map((n, i) => `<div ${A('up', .6 + i * .15)}><span>${esc(n.team)}</span>${esc(n.text)}</div>`).join('')}</div>`,
+};
+
+let scenes = [], cap;
+window.__build = (story, avatars, opts) => {
+  AV = avatars || {};
+  if (opts.vertical) document.body.classList.add('v');
+  document.getElementById('stage').innerHTML = story.scenes.map((s, i) => {
+    const c = s.color || story.accent || '#6b4eff';
+    const fg = lum(c) > .6 ? '#121212' : '#ffffff';
+    return `<section class="scene ${s.type}" style="--c:${c};--fg:${fg}"><div class="cam">${BUILD[s.type](s)}</div></section>`;
+  }).join('');
+  scenes = [...document.querySelectorAll('.scene')].map((el, i) => ({ el, cam: el.firstChild, s: story.scenes[i], parts: [...el.querySelectorAll('[data-a]')] }));
+  cap = document.getElementById('cap');
+  cap.style.display = opts.captions ? '' : 'none';
+  return document.fonts.ready.then(() => Promise.all([...document.images].map((im) => im.decode().catch(() => {}))));
+};
+
+function fmtNum(v, el) {
+  const dp = Number(el.dataset.dp || 0);
+  const s = v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+  return (el.dataset.fmt || '{}').replace('{}', s);
+}
+
+const WIPE = .32;
+window.__seek = (t) => {
+  let capText = '';
+  const wipe = document.getElementById('wipe');
+  wipe.style.clipPath = 'inset(0 0 0 100%)';
+  for (const [i, { el, cam, s, parts }] of scenes.entries()) {
+    const lt = t - s.start, len = s.end - s.start;
+    if (lt < 0 || lt >= len) { el.style.visibility = 'hidden'; continue; }
+    el.style.visibility = 'visible';
+    // hard cut, masked by a colour bar sweeping across the first WIPE seconds
+    if (i > 0 && lt < WIPE) {
+      const k = lt / WIPE;
+      wipe.style.background = s.color || '#121212';
+      wipe.style.clipPath = `inset(0 ${100 - out3(k * 2) * 100}% 0 ${Math.max(0, (k * 2 - 1)) * 100}%)`;
+    }
+    // slow push-in + tiny drift keeps every frame alive
+    cam.style.transform = `scale(${1.0 + .035 * (lt / len)}) rotate(${(i % 2 ? -1 : 1) * .25 * (lt / len)}deg)`;
+    for (const p of parts) {
+      const x = lt - Number(p.dataset.d), a = p.dataset.a;
+      if (a === 'count') {
+        const k = expo(x / 1.1), from = Number(p.dataset.from), to = Number(p.dataset.to);
+        p.textContent = fmtNum(from + (to - from) * k, p);
+        p.style.opacity = x < 0 ? 0 : 1;
+        continue;
+      }
+      if (a === 'slam') { const k = back(x / .38); p.style.opacity = x < 0 ? 0 : 1; p.style.transform = `translateY(${(1 - k) * 60}%) scale(${.7 + .3 * k})`; }
+      else if (a === 'pop') { const k = back(x / .4); p.style.opacity = clamp(x / .12); p.style.transform = `scale(${Math.max(0, k)})`; }
+      else if (a === 'up') { const k = out3(x / .5); p.style.opacity = k; p.style.transform = `translateY(${(1 - k) * 40}px)`; }
+      else if (a === 'fade') p.style.opacity = out3(x / .4);
+      else if (a === 'fly') { const k = out3(x / .9);
+        p.style.opacity = clamp(x / .2);
+        p.style.transform = `translateY(-50%) perspective(1400px) translateX(${(1 - k) * 60}%) rotateY(${-28 * (1 - k) - 6}deg) rotateX(${4 * (1 - k) + 3}deg) rotateZ(${(1 - k) * 4}deg) translateY(${-8 * Math.sin(lt * 1.3)}px)`; }
+      else if (a === 'reveal') p.style.clipPath = `inset(-20% ${100 - out3(x / 1.4) * 100}% -20% -5%)`;
+      else if (a === 'draw') { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L * (1 - out3(x / 1.4)); }
+      else if (a === 'fillx') p.style.transform = `scaleX(${Number(p.dataset.to) * out3(x / 1.2)})`;
+    }
+    if (s.caption) capText = s.caption;
+  }
+  const html = capText ? `<span>${esc(capText)}</span>` : '';
+  if (cap.innerHTML !== html) cap.innerHTML = html;
+};
+</script>
+</body>
+</html>

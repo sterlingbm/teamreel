@@ -1,0 +1,32 @@
+{
+  "template": "reel.html",
+  "title": "Northwind this week",
+  "team": "Northwind",
+  "range": "Nov 17 – 21",
+  "scenes": [
+    { "type": "hook", "dur": 3.4, "date": "Week of Nov 17", "lines": ["This week at", "Northwind:", "3 launches. $2.4M closed."], "highlight": ["3", "$2.4M"], "caption": "Your one-minute catch-up on the whole company" },
+
+    { "type": "team", "dur": 1.6, "team": "Payments", "sub": "Team 01 · 9 people", "color": "#6b4eff" },
+    { "type": "launch", "dur": 4.2, "team": "Payments", "color": "#6b4eff", "kicker": "Launched Tuesday",
+      "headline": "Customers can now pay with Apple Pay in 12 countries",
+      "people": [{ "name": "Maya Chen" }, { "name": "Jon Ortiz" }, { "name": "Priya Nair" }],
+      "mock": "<div style='font-size:calc(var(--u)*1.3);color:#777'>Checkout</div><div style='font-size:calc(var(--u)*3.4);font-weight:800;letter-spacing:-.03em;margin:.2em 0 .6em'>$48.00</div><div style='background:#000;color:#fff;border-radius:calc(var(--u)*.8);padding:calc(var(--u)*1.1);text-align:center;font-weight:700;font-size:calc(var(--u)*1.7)'>Pay with Apple Pay</div><div style='margin-top:calc(var(--u)*1.2);font-size:calc(var(--u)*2.2);letter-spacing:.15em'>🇺🇸 🇬🇧 🇩🇪 🇫🇷 🇯🇵 🇦🇺</div>",
+      "caption": "Apple Pay is live in 12 countries" },
+    { "type": "metric", "dur": 3.4, "team": "Payments", "color": "#6b4eff", "label": "Checkout conversion", "from": 3.1, "to": 3.6, "dp": 1, "fmt": "{}%", "delta": "+16%", "note": "vs. last week", "series": [3.0, 3.1, 3.05, 3.1, 3.12, 3.3, 3.6], "caption": "Checkout conversion up 16% in the first four days" },
+
+    { "type": "team", "dur": 1.6, "team": "Sales", "sub": "Team 02 · 14 people", "color": "#ff5a1f" },
+    { "type": "metric", "dur": 3.4, "team": "Sales", "color": "#ff5a1f", "label": "New annual revenue this week", "from": 0, "to": 2.4, "dp": 1, "fmt": "${}M", "delta": "Biggest week of the year", "note": "Contoso signed Thursday · 3-year deal", "series": [0.6, 0.9, 0.7, 1.1, 0.8, 1.3, 2.4], "caption": "Contoso signed: $2.4M, the biggest week of the year" },
+    { "type": "goal", "dur": 3.2, "team": "Sales", "color": "#ff5a1f", "label": "Q4 goal", "goal": "Hit $18M in new revenue by Dec 31", "pct": 81, "note": "$14.6M of $18M · 5 weeks left", "caption": "Sales is at 81% of the Q4 goal with five weeks left" },
+    { "type": "people", "dur": 3.0, "team": "Sales", "color": "#ff5a1f", "title": "Closed it", "people": [{ "name": "Dana Brooks", "role": "Account executive" }, { "name": "Leo Kim", "role": "Solutions engineer" }, { "name": "Ama Owusu", "role": "Legal" }], "caption": "Dana, Leo and Ama closed Contoso" },
+
+    { "type": "team", "dur": 1.6, "team": "Growth", "sub": "Team 03 · 6 people", "color": "#c6f432" },
+    { "type": "launch", "dur": 4.0, "team": "Growth", "color": "#c6f432", "kicker": "Shipped Friday",
+      "headline": "New sign-ups now get set up in 2 minutes, not 10",
+      "people": [{ "name": "Sam Rivera" }, { "name": "Ines Duarte" }],
+      "mock": "<div style='font-size:calc(var(--u)*1.3);color:#777'>Step 1 of 2</div><div style='font-size:calc(var(--u)*2.6);font-weight:800;letter-spacing:-.03em;margin:.3em 0 .7em'>Connect your bank</div><div style='display:grid;gap:calc(var(--u)*.7)'><div style='border:1px solid #ddd;border-radius:10px;padding:calc(var(--u)*1);font-weight:600;font-size:calc(var(--u)*1.5)'>Chase</div><div style='border:2px solid #121212;border-radius:10px;padding:calc(var(--u)*1);font-weight:700;font-size:calc(var(--u)*1.5)'>Bank of America ✓</div><div style='border:1px solid #ddd;border-radius:10px;padding:calc(var(--u)*1);font-weight:600;font-size:calc(var(--u)*1.5)'>Wells Fargo</div></div>",
+      "caption": "Onboarding cut from ten minutes to two" },
+    { "type": "goal", "dur": 3.0, "team": "Growth", "color": "#c6f432", "label": "Q4 goal", "goal": "40% of sign-ups active in week one", "pct": 64, "note": "Now 25.6% · was 19% before the new flow", "caption": "Week-one activation is at 64% of the Q4 target" },
+
+    { "type": "outro", "dur": 4.2, "line": "That's the week.", "next": [{ "team": "Payments", "text": "Google Pay in the same 12 countries" }, { "team": "Sales", "text": "Two enterprise pilots start Monday" }, { "team": "Growth", "text": "Testing the new pricing page" }], "caption": "Next week: Google Pay, two enterprise pilots, a new pricing page" }
+  ]
+}

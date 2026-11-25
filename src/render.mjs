@@ -6,7 +6,7 @@ import { spawn, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
-const TEMPLATE = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'template', 'index.html');
+const TPL_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'template');
 
 // Minimum time each scene needs for its animation to finish, in seconds.
 const MIN = {
@@ -21,7 +21,7 @@ export function timeline(story, voSecs) {
   for (const [i, s] of story.scenes.entries()) {
     const words = s.narration ? s.narration.split(/\s+/).length : 0;
     const speech = voSecs[i] || (words ? words / 2.6 : 0); // no voice: pace captions at reading speed
-    const len = Math.max(MIN[s.type](s), speech ? LEAD + speech + TAIL : 0);
+    const len = s.dur ?? Math.max((MIN[s.type] ?? (() => 3))(s), speech ? LEAD + speech + TAIL : 0);
     Object.assign(s, { start: +t.toFixed(3), end: +(t + len).toFixed(3), voStart: speech ? +(t + LEAD).toFixed(3) : null, voLen: +speech.toFixed(3) });
     t += len;
   }
@@ -47,7 +47,7 @@ export async function render({ story, avatars, voSecs, dir, out, vertical = fals
   const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto('file://' + TEMPLATE, { waitUntil: 'load' });
+  await page.goto('file://' + path.join(TPL_DIR, story.template || 'index.html'), { waitUntil: 'load' });
   await page.evaluate(([s, a, o]) => window.__build(s, a, o), [story, avatars, { vertical, captions, mark }]);
   if (errors.length) throw new Error('template error: ' + errors.join('; '));
 
