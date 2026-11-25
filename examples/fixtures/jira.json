@@ -1,0 +1,15 @@
+{
+  "Payments": {
+    "people": {
+      "jira:a1": { "id": "jira:a1", "name": "Jon Ortiz" },
+      "jira:a2": { "id": "jira:a2", "name": "Priya Nair" },
+      "jira:a3": { "id": "jira:a3", "name": "Maya Chen" }
+    },
+    "signals": [
+      { "source": "jira", "id": "PAY-412", "title": "Story: Apple Pay merchant validation for EU and APAC", "text": "Part of: Apple Pay international launch\nEnable merchant validation and domain association for the 10 non-US launch markets.", "people": ["jira:a1"], "url": "https://northwind.atlassian.net/browse/PAY-412", "date": "2026-11-17T20:00:00Z", "media": [], "meta": { "type": "Story", "epic": "Apple Pay international launch" } },
+      { "source": "jira", "id": "PAY-418", "title": "Story: Show Apple Pay button on mobile web checkout", "text": "Part of: Apple Pay international launch\nRender the Apple Pay button above card entry when the device supports it.", "people": ["jira:a2"], "url": "https://northwind.atlassian.net/browse/PAY-418", "date": "2026-11-18T16:00:00Z", "media": [], "meta": { "type": "Story", "epic": "Apple Pay international launch" } },
+      { "source": "jira", "id": "PAY-420", "title": "Task: Rotate Stripe webhook signing secret", "text": "Routine secret rotation.", "people": ["jira:a3"], "url": "https://northwind.atlassian.net/browse/PAY-420", "date": "2026-11-19T16:00:00Z", "media": [], "meta": { "type": "Task" } },
+      { "source": "jira", "id": "PAY-423", "title": "Bug: Refund emails show wrong currency symbol for JPY", "text": "Refund confirmation shows $ instead of ¥ for yen orders.", "people": ["jira:a1"], "url": "https://northwind.atlassian.net/browse/PAY-423", "date": "2026-11-20T16:00:00Z", "media": [], "meta": { "type": "Bug" } }
+    ]
+  }
+}

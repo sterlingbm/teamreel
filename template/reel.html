@@ -38,9 +38,12 @@
   .launch .fill { background: var(--paper); }
   .launch .kick { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 10); font-family: var(--mono); font-weight: 700; font-size: calc(var(--u) * 1.4); letter-spacing: .1em; text-transform: uppercase; background: var(--c); color: var(--fg); padding: .35em .7em; border-radius: 99px; }
   .launch h2 { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 15); width: 50%; font-weight: 800; font-size: calc(var(--u) * 5.8); line-height: .95; letter-spacing: -.035em; font-variation-settings: 'wdth' 85, 'opsz' 96; }
-  .launch .shot { position: absolute; right: calc(var(--u) * 5); top: 50%; width: calc(var(--u) * 38); transform-origin: 50% 50%; }
+  .launch .shot { position: absolute; right: calc(var(--u) * 4); top: 50%; width: calc(var(--u) * 44); transform-origin: 50% 50%; }
+  .launch .shot img { max-height: 72vh; object-fit: cover; object-position: top; }
+  .launch h2.solo { width: 88%; font-size: calc(var(--u) * 8); }
+  .launch .why { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 37); width: 70%; font-size: calc(var(--u) * 2.6); font-weight: 500; line-height: 1.2; letter-spacing: -.01em; opacity: .8; }
   .mini { width: calc(var(--u) * 4); } .mini .face { border-radius: 50%; font-size: calc(var(--u) * 1.5); }
-  .launch .who { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * 5); display: flex; align-items: center; gap: calc(var(--u) * 1.2); font-size: calc(var(--u) * 1.6); font-weight: 700; }
+  .launch .who { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * 6.6); display: flex; align-items: center; gap: calc(var(--u) * 1.2); font-size: calc(var(--u) * 1.6); font-weight: 700; }
 
   /* product mock: a browser/phone card drawn in HTML */
   .frame { background: #fff; border-radius: calc(var(--u) * 1.6); box-shadow: 0 calc(var(--u) * 3) calc(var(--u) * 6) rgba(0,0,0,.22), 0 0 0 1px rgba(0,0,0,.06); overflow: hidden; }
@@ -69,7 +72,7 @@
   /* people */
   .people .fill { background: var(--paper); }
   .people h3 { position: absolute; left: calc(var(--u) * 4); top: calc(var(--u) * 10); font-size: calc(var(--u) * 6); }
-  .people .row { position: absolute; left: calc(var(--u) * 4); right: calc(var(--u) * 4); bottom: calc(var(--u) * 7); display: flex; gap: calc(var(--u) * 2.4); }
+  .people .row { position: absolute; left: calc(var(--u) * 4); right: calc(var(--u) * 4); bottom: calc(var(--u) * 6.4); display: flex; gap: calc(var(--u) * 2.4); }
   .person { flex: 1; }
   .face { width: 100%; aspect-ratio: 1; border-radius: calc(var(--u) * 2); display: grid; place-items: center; font-weight: 800; font-size: calc(var(--u) * 7); color: var(--fg); background: var(--c); overflow: hidden; }
   .face img { width: 100%; height: 100%; object-fit: cover; }
@@ -83,7 +86,8 @@
   .outro .next div { border-top: 3px solid var(--c2); padding-top: calc(var(--u) * 1); color: var(--paper); font-size: calc(var(--u) * 1.9); font-weight: 700; line-height: 1.15; }
   .outro .next div span { display: block; font-family: var(--mono); font-size: calc(var(--u) * 1.1); color: var(--c2); letter-spacing: .1em; text-transform: uppercase; margin-bottom: .5em; }
 
-  #cap { position: absolute; left: 50%; bottom: calc(var(--u) * 1.2); transform: translateX(-50%); z-index: 9; font-weight: 700; font-size: calc(var(--u) * 1.5); white-space: nowrap; }
+  #cap { position: absolute; left: 50%; bottom: calc(var(--u) * 1.2); transform: translateX(-50%); z-index: 9; font-weight: 700; font-size: calc(var(--u) * 1.5); max-width: 84%; text-align: center; line-height: 1.5; }
+  #cap span { box-decoration-break: clone; -webkit-box-decoration-break: clone; }
   #cap span { background: var(--ink); color: var(--paper); padding: .2em .55em; border-radius: 6px; }
   #wipe { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
 </style>
@@ -123,8 +127,9 @@ const BUILD = {
     <div class="name slam">${words(s.team, .05, .09)}</div>`,
   launch: (s) => `<div class="fill"></div>${tag({ ...s, onPaper: true })}
     <div class="kick" ${A('pop', .05)}>${esc(s.kicker || 'Launched')}</div>
-    <h2>${words(s.headline, .25, .06, 'up')}</h2>
-    <div class="shot" ${A('fly', .35)}><div class="frame"><div class="bar"><b></b><b></b><b></b></div>${s.image ? `<img src="${s.image}">` : `<div class="body">${s.mock || ''}</div>`}</div></div>
+    <h2 class="${s.image || s.mock ? '' : 'solo'}">${words(s.headline, .25, .06, 'up')}</h2>
+    ${!s.image && !s.mock && s.caption ? `<p class="why" ${A('up', .9)}>${esc(s.caption)}${(s.caption = '', '')}</p>` : ''}
+    ${s.image || s.mock ? `<div class="shot" ${A('fly', .35)}><div class="frame"><div class="bar"><b></b><b></b><b></b></div>${s.image ? `<img src="${s.image}">` : `<div class="body">${s.mock}</div>`}</div></div>` : ''}
     <div class="who" ${A('up', 1.4)}>${(s.people || []).slice(0, 3).map((p) => `<div class="mini">${face(p)}</div>`).join('')}<span>${esc((s.people || []).map((p) => p.name.split(' ')[0]).join(', '))}</span></div>`,
   metric: (s) => `<div class="fill"></div>${tag(s)}
     <div class="lbl" ${A('fade', .05)}>${esc(s.label)}</div>

@@ -1,0 +1,24 @@
+{
+  "Sales": {
+    "people": {
+      "slack:U01": { "id": "slack:U01", "name": "Dana Brooks", "title": "Account Executive" },
+      "slack:U02": { "id": "slack:U02", "name": "Leo Kim", "title": "Solutions Engineer" },
+      "slack:U03": { "id": "slack:U03", "name": "Ama Owusu", "title": "Commercial Counsel" },
+      "slack:U04": { "id": "slack:U04", "name": "Rachel Stein", "title": "VP Sales" }
+    },
+    "signals": [
+      { "source": "slack", "id": "#sales-wins/1", "title": "Dana Brooks in #sales-wins", "text": "SIGNED: Contoso, 3-year deal, $2.4M ARR. Biggest deal of the year. Huge thanks to @Leo Kim for the security review marathon and @Ama Owusu for turning the MSA around in 4 days.", "people": ["slack:U01", "slack:U02", "slack:U03"], "url": null, "date": "2026-11-20T18:02:00Z", "media": [], "meta": { "channel": "#sales-wins", "reactions": 61, "replies": 14 } },
+      { "source": "slack", "id": "#sales/2", "title": "Rachel Stein in #sales", "text": "Q4 check-in: we're at $14.6M of our $18M new-ARR target with 5 weeks left. Contoso moved us 13 points this week. Next up: two enterprise pilots (Fabrikam, Tailspin) kick off Monday.", "people": ["slack:U04"], "url": null, "date": "2026-11-21T15:30:00Z", "media": [], "meta": { "channel": "#sales", "reactions": 23, "replies": 3 } },
+      { "source": "slack", "id": "#sales/3", "title": "Leo Kim in #sales", "text": "Reminder: please log demo notes in the CRM within 24h of the call.", "people": ["slack:U02"], "url": null, "date": "2026-11-18T14:00:00Z", "media": [], "meta": { "channel": "#sales", "reactions": 2, "replies": 0 } }
+    ]
+  },
+  "Payments": {
+    "people": {
+      "slack:U10": { "id": "slack:U10", "name": "Maya Chen", "title": "Engineering Manager, Payments" },
+      "slack:U11": { "id": "slack:U11", "name": "Jon Ortiz", "title": "Senior Engineer" }
+    },
+    "signals": [
+      { "source": "slack", "id": "#payments/1", "title": "Maya Chen in #payments", "text": "Apple Pay is live in all 12 launch countries as of Tuesday. Early read after 4 days: checkout conversion went from 3.1% to 3.6% on mobile web. Google Pay in the same countries is next.", "people": ["slack:U10"], "url": null, "date": "2026-11-21T17:10:00Z", "media": [], "meta": { "channel": "#payments", "reactions": 38, "replies": 6 } }
+    ]
+  }
+}
